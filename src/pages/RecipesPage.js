@@ -59,7 +59,7 @@ function RecipesPage() {
     <div className="page">
       <h1>My Recipes</h1>
       <ButtonBar>
-        <Button onClick={() => console.log("clicked")}>Add Recipe</Button>
+        <Button onClick={() => navigate("/recipes/new")}>Add Recipe</Button>
       </ButtonBar>
       <Recipes recipes={recipes} />
     </div>

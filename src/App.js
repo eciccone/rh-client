@@ -4,6 +4,7 @@ import NavBar from './components/nav/NavBar';
 import { Route, Routes } from 'react-router';
 import HomePage from './pages/HomePage';
 import RecipesPage from './pages/RecipesPage';
+import CreateRecipePage from './pages/CreateRecipePage';
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
         <Routes>
           <Route exact path="/" element={<HomePage />} />
           <Route path="/recipes" element={<RecipesPage />} />
+          <Route path="/recipes/new" element={<CreateRecipePage />} />
         </Routes>
       )}
     </div>

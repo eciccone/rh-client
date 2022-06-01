@@ -1,0 +1,60 @@
+.recipe-form {
+  max-width: 700px;
+  margin: auto;
+}
+
+.form-group {
+  margin: 2.5rem 0;
+}
+
+.form-input {
+  width: 100%;
+  border: 0;
+  border-bottom: 0.25rem solid var(--nav-contrast);
+  font-size: large;
+}
+
+.form-input:focus {
+  outline: none;
+}
+
+.ingredient-input {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  grid-gap: 1rem;
+  margin-bottom: 10px;
+}
+
+.ingredient-button-bar {
+  display: flex;
+  justify-content: flex-start;
+  margin: 1rem 0;
+}
+
+.form-btn-bar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.form-btn-bar .btn {
+  margin: 0 0.5rem;
+}
+
+.file-upload-label {
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.fa-upload {
+  margin-right: 0.5rem;
+}
+
+.file-name {
+  margin-top: 1rem;
+}
+
+.file-image {
+  height: 20rem;
+  width: auto;
+  object-fit: cover;
+}
