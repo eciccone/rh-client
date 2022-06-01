@@ -1,0 +1,7 @@
+.btn-bar {
+  margin-bottom: 1rem;
+}
+
+.btn-bar > * {
+  margin: 10px;
+}

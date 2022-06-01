@@ -3,6 +3,8 @@ import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import Recipes from "../components/recipe/Recipes";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { ButtonBar } from "../components/btn/ButtonBar";
+import { Button } from "../components/btn/Button";
 
 async function GetRecipes(accessToken, limit = 10, offset = 0) {
   const res = await fetch(`http://localhost:8080/recipes?limit=${limit}&offset=${offset}`, {
@@ -56,6 +58,9 @@ function RecipePage() {
   return (
     <div className="page">
       <h1>My Recipes</h1>
+      <ButtonBar>
+        <Button onClick={() => console.log("clicked")}>Add Recipe</Button>
+      </ButtonBar>
       <Recipes recipes={recipes} />
     </div>
   );
