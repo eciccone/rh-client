@@ -5,20 +5,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { ButtonBar } from "../components/btn/ButtonBar";
 import { Button } from "../components/btn/Button";
-
-async function GetRecipes(accessToken, limit = 10, offset = 0) {
-  const res = await fetch(`http://localhost:8080/recipes?limit=${limit}&offset=${offset}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  }).catch(err => {
-    // request failed - server may not be running.
-    err.nav = "/";
-    throw err;
-  });
-
-  return res;
-}
+import { GetRecipes } from "../api/Recipe";
 
 function RecipesPage() {
   const [recipes, setRecipes] = useState(null);

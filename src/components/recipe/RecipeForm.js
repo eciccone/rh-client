@@ -1,50 +1,16 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { PostRecipe, PutRecipeImage } from '../../api/Recipe';
 import { Button } from '../btn/Button';
 import { ButtonBar } from '../btn/ButtonBar';
 import './RecipeForm.css';
-
-async function PostRecipe(accessToken, requestBody) {
-  const requestOptions = {
-    method: "POST",
-    headers: { Authorization: `Bearer ${accessToken}` },
-    body: JSON.stringify(requestBody)
-  }
-
-  const res = await fetch("http://localhost:8080/recipes", requestOptions).catch(err => {
-    // request failed - server may not be running.
-    err.nav = "/recipes";
-    console.log("error in PostRecipe");
-    console.log(err);
-    throw err;
-  });
-
-  return res;
-}
-
-async function PutRecipeImage(accessToken, recipeId, formData) {
-  const imagePutOptions = {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${accessToken}` },
-    body: formData
-  }
-
-  const res = await fetch(`http://localhost:8080/recipes/${recipeId}/image`, imagePutOptions).catch(err => {
-    // request failed - server may not be running.
-    err.nav = "/recipes";
-    console.log("error in PutRecipeImage");
-    console.log(err);
-    throw err;
-  });
-
-  return res;
-}
 
 export default function RecipeForm({
   editingName = "",
   editingIngredients = [{ id: 0, name: "", amount: "", unit: "" }]
 }) {
+  
   const { getAccessTokenSilently} = useAuth0();
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [preview, setPreview] = useState();
