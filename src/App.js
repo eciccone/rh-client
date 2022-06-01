@@ -3,7 +3,7 @@ import './App.css';
 import NavBar from './components/nav/NavBar';
 import { Route, Routes } from 'react-router';
 import HomePage from './pages/HomePage';
-import RecipePage from './pages/RecipePage';
+import RecipesPage from './pages/RecipesPage';
 
 function App() {
 
@@ -16,7 +16,7 @@ function App() {
       {isLoading ? <h1>Loading...</h1> : (
         <Routes>
           <Route exact path="/" element={<HomePage />} />
-          <Route path="/recipes" element={<RecipePage />} />
+          <Route path="/recipes" element={<RecipesPage />} />
         </Routes>
       )}
     </div>

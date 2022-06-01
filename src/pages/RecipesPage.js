@@ -20,7 +20,7 @@ async function GetRecipes(accessToken, limit = 10, offset = 0) {
   return res;
 }
 
-function RecipePage() {
+function RecipesPage() {
   const [recipes, setRecipes] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -66,6 +66,6 @@ function RecipePage() {
   );
 }
 
-export default withAuthenticationRequired(RecipePage, {
+export default withAuthenticationRequired(RecipesPage, {
   onRedirecting: () => <div>Loading...</div>,
 });
