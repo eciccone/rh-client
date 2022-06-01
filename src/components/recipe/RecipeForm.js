@@ -1,27 +1,29 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { PostRecipe, PutRecipeImage } from '../../api/Recipe';
+import { PostRecipe, PutRecipe, PutRecipeImage } from '../../api/Recipe';
 import { Button } from '../btn/Button';
 import { ButtonBar } from '../btn/ButtonBar';
 import './RecipeForm.css';
 
 export default function RecipeForm({
+  editingId = 0,
   editingName = "",
   editingIngredients = [{ id: 0, name: "", amount: "", unit: "" }]
 }) {
-  
+
   const { getAccessTokenSilently} = useAuth0();
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [preview, setPreview] = useState();
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
   const form = useRef(null);
+
+  const [id] = useState(editingId);
   const [name, setName] = useState(editingName);
   const [ingredients, setIngredients] = useState(editingIngredients)
 
-  const handleChange = (i, e) => {
+  const handleIngredientChange = (i, e) => {
     const newIngredientValues = [...ingredients];
     newIngredientValues[i][e.target.name] = e.target.value;
     setIngredients(newIngredientValues);
@@ -32,15 +34,11 @@ export default function RecipeForm({
     setName(newName);
   }
 
-  const addFormGroup = () => {
-    setIngredients([...ingredients, {
-      amount: "",
-      unit: "",
-      name: "",
-    }]);
+  const addIngredientFormGroup = () => {
+    setIngredients([...ingredients, {id: 0, amount: "", unit: "", name: ""} ]);
   }
 
-  const removeFormGroup = (i) => {
+  const removeIngredientFormGroup = (i) => {
     const newIngredientValues = [...ingredients];
     newIngredientValues.splice(i, 1);
     setIngredients(newIngredientValues);
@@ -67,27 +65,43 @@ export default function RecipeForm({
     const token = await getAccessTokenSilently();
 
     const requestBody = {
-      name: e.target.title.value,
+      name: name,
       ingredients: ingredients
     };
 
-    const res = await PostRecipe(token, requestBody)
-      .then(res => checkError(res))
-      .catch(err => setError(err.msg))
+    if (id === 0) {
+      const res = await PostRecipe(token, requestBody)
+        .then(res => checkError(res))
+        .catch(err => setError(err.msg))
 
-    if (res.ok) {
-      if (selectedFiles !== null) {
-        const json = await res.json();
-        const imageFormData = new FormData();
-        imageFormData.append("image", selectedFiles);
-        await PutRecipeImage(token, json.recipe.id, imageFormData)
-          .then(res => checkError(res))
-          .then(() => navigate("/recipes"))
-          .catch(err => setError(err.msg))
+      if (res.ok) {
+        if (selectedFiles !== null) {
+          const json = await res.json();
+          const imageFormData = new FormData();
+          imageFormData.append("image", selectedFiles);
+          await PutRecipeImage(token, json.recipe.id, imageFormData)
+            .then(res => checkError(res))
+            .catch(err => setError(err.msg))
+        }
+        navigate("/recipes");
       }
-      navigate("/recipes");
-    }
+    } else {
+      const res = await PutRecipe(token, id, requestBody)
+        .then(res => checkError(res))
+        .catch(err => setError(err.msg))
 
+      if (res.ok) {
+        if (selectedFiles !== null) {
+          const json = await res.json();
+          const imageFormData = new FormData();
+          imageFormData.append("image", selectedFiles);
+          await PutRecipeImage(token, json.recipe.id, imageFormData)
+            .then(res => checkError(res))
+            .catch(err => setError(err.msg))
+        }
+        navigate("/recipes");
+      }
+    }
     
   }
 
@@ -113,17 +127,20 @@ export default function RecipeForm({
       {ingredients.map((element, index) => (
         <div className="form-group">
           <div className="ingredient-input" key={index}>
-            <input value={ingredients[index].amount} className="form-input" type="text" placeholder="Amount" name="amount" onChange={e => handleChange(index, e)} />
-            <input value={ingredients[index].unit} className="form-input" type="text" placeholder="Unit" name="unit" onChange={e => handleChange(index, e)} />
-            <input value={ingredients[index].name} className="form-input" text="text" placeholder="Ingredient name" name="name" onChange={e => handleChange(index, e)} />
+            <input value={ingredients[index].amount} className="form-input" type="text" placeholder="Amount" 
+              name="amount" onChange={e => handleIngredientChange(index, e)} />
+            <input value={ingredients[index].unit} className="form-input" type="text" placeholder="Unit" 
+              name="unit" onChange={e => handleIngredientChange(index, e)} />
+            <input value={ingredients[index].name} className="form-input" text="text" placeholder="Ingredient name" 
+              name="name" onChange={e => handleIngredientChange(index, e)} />
           </div> 
           {index === ingredients.length - 1 && ingredients.length > 1 ? 
-            <Button className="" type="button" onClick={() => removeFormGroup(index)}>Remove</Button> : null}
+            <Button className="" type="button" onClick={() => removeIngredientFormGroup(index)}>Remove</Button> : null}
         </div>
       ))}
 
       <ButtonBar>
-        <Button className="" type="button" onClick={() => addFormGroup()}>Add ingredient</Button>
+        <Button className="" type="button" onClick={() => addIngredientFormGroup()}>Add ingredient</Button>
       </ButtonBar>
 
       <div className="form-group">
@@ -135,8 +152,8 @@ export default function RecipeForm({
 
         { selectedFiles && (
           <div>
-          <p className="file-name">{selectedFiles.name}</p>
-          <img className="file-image" src={preview} alt="upload" />
+            <p className="file-name">{selectedFiles.name}</p>
+            <img className="file-image" src={preview} alt="upload" />
           </div>
         )}
 

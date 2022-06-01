@@ -10,28 +10,30 @@ import { GetRecipes } from "../api/Recipe";
 function RecipesPage() {
   const [recipes, setRecipes] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState();
   const navigate = useNavigate();
   const { getAccessTokenSilently } = useAuth0();
-
-  // if 404 on a request to /recipes then a profile has not yet been made with recihub.
-  const check404 = res => {
-    if (res.ok) {
-      return res;
-    } else {
-      const err = new Error(404);
-      err.nav = "/";
-      throw err;
-    }
-  }
 
   useEffect(() => {
     const getRecipes = async () => {
       const token = await getAccessTokenSilently();
       await GetRecipes(token)
-        .then(res => check404(res))
+        .then(async res => {
+          if (res.ok) return res;
+
+          const json = await res.json();
+          const err = new Error(json.msg);
+          throw err;
+        })
         .then(res => res.json())
-        .then(res => setRecipes(res.recipes))
-        .catch(err => navigate(err.nav))
+        .then(json => setRecipes(json.recipes))
+        .catch(err => {
+          if (err.message === "profile not found") {
+            navigate("/");
+          } else {
+            setError(err.message);
+          }
+        })
         .finally(() => setIsLoading(false));
     };
 
@@ -45,6 +47,9 @@ function RecipesPage() {
   return (
     <div className="page">
       <h1>My Recipes</h1>
+
+      {error}
+      
       <ButtonBar>
         <Button onClick={() => navigate("/recipes/new")}>Add Recipe</Button>
       </ButtonBar>
