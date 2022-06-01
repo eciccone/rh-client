@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+h1 {
+  margin: 0;
+}
+
+:root {
+  --nav-primary: #001233;
+  --nav-secondary: #efe0ca;
+  --nav-contrast: rgb(255, 89, 90);
+  --nav-mobile-menu-bg: #33415b;
+  --nav-bar-height: 80px;
+}
