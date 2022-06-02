@@ -20,7 +20,6 @@ function RecipesPage() {
       await GetRecipes(token)
         .then(async res => {
           if (res.ok) return res;
-
           const json = await res.json();
           const err = new Error(json.msg);
           throw err;
@@ -29,7 +28,7 @@ function RecipesPage() {
         .then(json => setRecipes(json.recipes))
         .catch(err => {
           if (err.message === "profile not found") {
-            navigate("/");
+            navigate("/profile/new", { state: { redirect: "/recipes" }});
           } else {
             setError(err.message);
           }
@@ -49,7 +48,7 @@ function RecipesPage() {
       <h1>My Recipes</h1>
 
       {error}
-      
+
       <ButtonBar>
         <Button onClick={() => navigate("/recipes/new")}>Add Recipe</Button>
       </ButtonBar>
