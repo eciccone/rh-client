@@ -1,6 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { PostRecipe, PutRecipe, PutRecipeImage } from '../../api/Recipe';
 import { Button } from '../btn/Button';
 import { ButtonBar } from '../btn/ButtonBar';
@@ -18,6 +18,7 @@ export default function RecipeForm({
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const form = useRef(null);
+  const location = useLocation();
 
   const [id] = useState(editingId);
   const [name, setName] = useState(editingName);
@@ -99,7 +100,12 @@ export default function RecipeForm({
             .then(res => checkError(res))
             .catch(err => setError(err.msg))
         }
-        navigate("/recipes");
+
+        if (location.state !== null) {
+          navigate(location.state.redirect);
+        } else {
+          navigate("/recipes");
+        }
       }
     }
     
