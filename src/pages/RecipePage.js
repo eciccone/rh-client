@@ -41,6 +41,7 @@ function RecipePage() {
           
           <ButtonBar>
             <Button onClick={() => navigate(`/recipes/${recipeId}/edit`, { state: { redirect: `/recipes/${recipeId}` }})}>Edit</Button>
+            <Button onClick={() => navigate(`/recipes/${recipeId}/delete`, { state: { redirect: `/recipes` }})}>Delete</Button>
           </ButtonBar>
           
           <p>{data.recipe.username}</p>
