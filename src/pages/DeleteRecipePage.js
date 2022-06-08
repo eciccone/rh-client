@@ -22,7 +22,7 @@ const deleteRecipe = (accessToken, recipeId) => {
   });
 }
 
-function RecipePage() {
+function DeleteRecipePage() {
   const navigate = useNavigate();
   const { getAccessTokenSilently } = useAuth0();
   const { recipeId } = useParams();
@@ -83,6 +83,6 @@ function RecipePage() {
   );
 }
 
-export default withAuthenticationRequired(RecipePage, {
+export default withAuthenticationRequired(DeleteRecipePage, {
   onRedirecting: () => <div>Loading...</div>,
 });
