@@ -150,7 +150,7 @@ export default function RecipeForm({
       </div>
 
       {ingredients.map((element, index) => (
-        <div className="form-group">
+        <div className="form-group" key={index}>
           <div className="ingredient-input" key={index}>
             <input value={ingredients[index].amount} className="form-input" type="text" placeholder="Amount" 
               name="amount" onChange={e => handleIngredientChange(index, e)} />
@@ -169,7 +169,7 @@ export default function RecipeForm({
       </ButtonBar>
 
       {steps.map((element, index) => (
-        <div className="form-group">
+        <div className="form-group" key={index}>
           <div className="step-input">
             <input value={steps[index].description} className="form-input" type="text" placeholder="Step description"
               name="description" onChange={e => handleStepChange(index, e)} />
