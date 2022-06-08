@@ -201,7 +201,7 @@ export default function RecipeForm({
 
       <ButtonBar>
         <Button type="submit">Submit</Button>
-        <Button type="button" onClick={() => navigate("/recipes")}>Cancel</Button>
+        <Button type="button" onClick={() => navigate(location.state.redirect)}>Cancel</Button>
       </ButtonBar>
     </form>
   );

@@ -50,7 +50,7 @@ function RecipesPage() {
       {error}
 
       <ButtonBar>
-        <Button onClick={() => navigate("/recipes/new")}>Add Recipe</Button>
+        <Button onClick={() => navigate("/recipes/new", { state: { redirect: "/recipes" }})}>Add Recipe</Button>
       </ButtonBar>
       <Recipes recipes={recipes} />
     </div>
