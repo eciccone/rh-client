@@ -1,10 +1,39 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { PostRecipe, PutRecipe, PutRecipeImage } from '../../api/Recipe';
 import { Button } from '../btn/Button';
 import { ButtonBar } from '../btn/ButtonBar';
 import './RecipeForm.css';
+
+const postRecipe = (accessToken, data) => {
+  return fetch(`http://localhost:8080/recipes`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(data)
+  });
+}
+
+const putRecipe = (accessToken, recipeId, data) => {
+  return fetch(`http://localhost:8080/recipes/${recipeId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(data)
+  });
+}
+
+const putRecipeImage = (accessToken, recipeId, formData) => {
+  return fetch(`http://localhost:8080/recipes/${recipeId}/image`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: formData
+  })
+}
 
 export default function RecipeForm({
   editingId = 0,
@@ -16,7 +45,7 @@ export default function RecipeForm({
   const { getAccessTokenSilently} = useAuth0();
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [preview, setPreview] = useState();
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const form = useRef(null);
   const location = useLocation();
@@ -53,7 +82,7 @@ export default function RecipeForm({
     setIngredients(newIngredientValues);
   }
 
-  const addStepFormGroup = (i) => {
+  const addStepFormGroup = () => {
     setSteps([...steps, {description: ""}]);
   }
 
@@ -67,65 +96,39 @@ export default function RecipeForm({
     setSelectedFiles(e.target.files[0]);
   }
 
-  const checkError = async res => {
-    if (res.ok) {
-      return res;
-    } else {
-      const json = await res.json();
-      const err = new Error();
-      err.msg = json.msg;
-      throw err;
-    }
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const body = { name: name, ingredients: ingredients, steps: steps };
     const token = await getAccessTokenSilently();
 
-    const requestBody = {
-      name: name,
-      ingredients: ingredients,
-      steps: steps
-    };
+    let res, recipeId;
 
+    // if id is 0 then creating a new recipe, if id is not 0 then a recipe
+    // is being updated
     if (id === 0) {
-      const res = await PostRecipe(token, requestBody)
-        .then(res => checkError(res))
-        .catch(err => setError(err.msg))
-
-      if (res.ok) {
-        if (selectedFiles !== null) {
-          const json = await res.json();
-          const imageFormData = new FormData();
-          imageFormData.append("image", selectedFiles);
-          await PutRecipeImage(token, json.recipe.id, imageFormData)
-            .then(res => checkError(res))
-            .catch(err => setError(err.msg))
-        }
-        navigate("/recipes");
-      }
+      res = await postRecipe(token, body);
     } else {
-      const res = await PutRecipe(token, id, requestBody)
-        .then(res => checkError(res))
-        .catch(err => setError(err.msg))
+      res = await putRecipe(token, id, body);
+    }
 
-      if (res.ok) {
-        if (selectedFiles !== null) {
-          const json = await res.json();
-          const imageFormData = new FormData();
-          imageFormData.append("image", selectedFiles);
-          await PutRecipeImage(token, json.recipe.id, imageFormData)
-            .then(res => checkError(res))
-            .catch(err => setError(err.msg))
-        }
+    const json = await res.json();
 
-        if (location.state !== null) {
-          navigate(location.state.redirect);
-        } else {
-          navigate("/recipes");
-        }
+    if (res.ok) {
+      // if recipe is being created assign recipeId to json response, otherwise
+      // recipeId is being edited and is already known
+      id === 0 ? recipeId = json.recipe.id : recipeId = id;
+
+      // if a image file is present, update the image for the recipe being
+      // deleted/created
+      if (selectedFiles !== null) {
+        const imageFormData = new FormData();
+        imageFormData.append("image", selectedFiles);
+        await putRecipeImage(token, recipeId, imageFormData);
       }
+
+      navigate(`/recipes/${recipeId}`);
+    } else {
+      setError(json.msg);
     }
     
   }
