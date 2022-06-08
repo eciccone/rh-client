@@ -29,7 +29,6 @@ function DeleteRecipePage() {
 
   const [recipe, setRecipe] = useState(null);
   const [error, setError] = useState(null);
-  const [fetched, setFetched] = useState(false);
 
   const handleDelete = async () => {
     const token = await getAccessTokenSilently();
@@ -54,18 +53,14 @@ function DeleteRecipePage() {
       setRecipe(json.recipe);
     }
 
-    setFetched(true);
   }, [getAccessTokenSilently, recipeId])
 
   useEffect(() => {
-    if (!fetched) {
-      fetchRecipe();
-    }
-  }, [fetched, fetchRecipe]);
+    fetchRecipe();
+  }, [fetchRecipe]);
 
   return (
     <div className="page">
-      { !fetched && <p>Fetching Recipe...</p> }
       
       { error && <p>{error}</p> }
 
