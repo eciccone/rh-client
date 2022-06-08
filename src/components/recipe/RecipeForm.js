@@ -9,7 +9,8 @@ import './RecipeForm.css';
 export default function RecipeForm({
   editingId = 0,
   editingName = "",
-  editingIngredients = [{ id: 0, name: "", amount: "", unit: "" }]
+  editingIngredients = [{ id: 0, name: "", amount: "", unit: "" }],
+  editingSteps = [{ description: ""}]
 }) {
 
   const { getAccessTokenSilently} = useAuth0();
@@ -22,12 +23,19 @@ export default function RecipeForm({
 
   const [id] = useState(editingId);
   const [name, setName] = useState(editingName);
-  const [ingredients, setIngredients] = useState(editingIngredients)
+  const [ingredients, setIngredients] = useState(editingIngredients);
+  const [steps, setSteps] = useState(editingSteps);
 
   const handleIngredientChange = (i, e) => {
     const newIngredientValues = [...ingredients];
     newIngredientValues[i][e.target.name] = e.target.value;
     setIngredients(newIngredientValues);
+  }
+
+  const handleStepChange = (i, e) => {
+    const newStepValues = [...steps];
+    newStepValues[i][e.target.name] = e.target.value;
+    setSteps(newStepValues);
   }
 
   const handleNameChange = e => {
@@ -43,6 +51,16 @@ export default function RecipeForm({
     const newIngredientValues = [...ingredients];
     newIngredientValues.splice(i, 1);
     setIngredients(newIngredientValues);
+  }
+
+  const addStepFormGroup = (i) => {
+    setSteps([...steps, {description: ""}]);
+  }
+
+  const removeStepFormGroup = (i) => {
+    const newStepValues = [...steps];
+    newStepValues.splice(i, 1);
+    setSteps(newStepValues);
   }
 
   const handleSelectedFile = (e) => {
@@ -67,7 +85,8 @@ export default function RecipeForm({
 
     const requestBody = {
       name: name,
-      ingredients: ingredients
+      ingredients: ingredients,
+      steps: steps
     };
 
     if (id === 0) {
@@ -147,6 +166,21 @@ export default function RecipeForm({
 
       <ButtonBar>
         <Button className="" type="button" onClick={() => addIngredientFormGroup()}>Add ingredient</Button>
+      </ButtonBar>
+
+      {steps.map((element, index) => (
+        <div className="form-group">
+          <div className="step-input">
+            <input value={steps[index].description} className="form-input" type="text" placeholder="Step description"
+              name="description" onChange={e => handleStepChange(index, e)} />
+          </div>
+          {index === steps.length - 1 && steps.length > 1 ? 
+            <Button className="" type="button" onClick={() => removeStepFormGroup(index)}>Remove</Button> : null}
+        </div>
+      ))}
+
+      <ButtonBar>
+        <Button className="" type="button" onClick={() => addStepFormGroup()}>Add Step</Button>
       </ButtonBar>
 
       <div className="form-group">

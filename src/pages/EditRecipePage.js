@@ -47,7 +47,7 @@ function EditRecipePage() {
   return (
     <div className="page">
       <h1>Edit a recipe</h1>
-      <RecipeForm editingId={recipeId} editingName={recipe.name} editingIngredients={recipe.ingredients} />
+      <RecipeForm editingId={recipeId} editingName={recipe.name} editingIngredients={recipe.ingredients} editingSteps={recipe.steps} />
     </div>
   )
 }
