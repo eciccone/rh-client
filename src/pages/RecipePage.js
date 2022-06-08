@@ -1,72 +1,71 @@
 import "./Page.css";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
-import Recipes from "../components/recipe/Recipes";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { ButtonBar } from "../components/btn/ButtonBar";
 import { Button } from "../components/btn/Button";
-import { GetRecipe, GetRecipes } from "../api/Recipe";
+import useApi from "../hooks/useApi";
+
+const getRecipe = (accessToken, recipeId) => {
+  return fetch(`http://localhost:8080/recipes/${recipeId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+}
 
 function RecipePage() {
-  
+  const navigate = useNavigate();
   const { getAccessTokenSilently } = useAuth0();
   const { recipeId } = useParams();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState();
-  const [recipe, setRecipe] = useState();
+  const { data, error, loading, request } = useApi(getRecipe);
 
   useEffect(() => {
     const getRecipe = async () => {
       const token = await getAccessTokenSilently();
-      await GetRecipe(token, recipeId)
-        .then(async res => {
-          if (!res.ok) {
-            const json = await res.json();
-            const err = new Error(json.msg);
-            throw err;
-          }
+      request(token, recipeId);
+    }
 
-          return res;
-        })
-        .then(res => res.json())
-        .then(res => setRecipe(res.recipe))
-        .catch(err => setError(err.message))
-        .finally(() => setIsLoading(false));
-    };
-
-    getRecipe();
-  }, [getAccessTokenSilently]);
-
-  if (isLoading) {
-    return <div>Loading...</div>
-  }
-
-  if (error) {
-    return <div>{error}</div>
-  }
+    if (!loading) {
+      getRecipe();
+    }
+  }, [getAccessTokenSilently, request, recipeId, loading]);
 
   return (
     <div className="page">
-      <h1>{recipe.name}</h1>
+      { loading && <p>Recipe is loading...</p> }
+      { error && <p>{error}</p> }
+      { data !== null && (
+        <>
+          <h1>{data.recipe.name}</h1>
+          
+          <ButtonBar>
+            <Button onClick={() => navigate(`/recipes/${recipeId}/edit`, { state: { redirect: `/recipes/${recipeId}` }})}>Edit</Button>
+          </ButtonBar>
+          
+          <p>{data.recipe.username}</p>
 
-      <ButtonBar>
-        <Button onClick={() => navigate(`/recipes/${recipeId}/edit`, { state: { redirect: `/recipes/${recipeId}` }})}>Edit</Button>
-      </ButtonBar>
+          <img src={`http://localhost:8080/static/images/${data.recipe.image}?time=${new Date()}`} style={{width: "300px"}} alt="recipe" />
 
-      <p>{recipe.username}</p>
-      <img src={`http://localhost:8080/static/images/${recipe.image}?time=${new Date()}`} style={{width: "300px"}} />
+          <h2>Ingredients:</h2>
+          {data.recipe.ingredients?.map((ing, index) => {
+            return (
+              <div key={index}>
+                {ing.amount} {ing.unit} {ing.name}
+              </div>
+            )
+          })}
 
-      <h2>Ingredients:</h2>
-
-      {recipe.ingredients.map((ing, index) => {
-        return (
-        <div key={index}>
-          {ing.amount} {ing.unit} {ing.name}
-        </div>
-        )
-      })}
-
+          <h2>Steps:</h2>
+          {data.recipe.steps?.map((step, index) => {
+            return (
+              <div key={index}>
+                Step {step.step_number} {step.description}
+              </div>
+            )
+          })}
+        </>
+      )}
     </div>
   );
 }
