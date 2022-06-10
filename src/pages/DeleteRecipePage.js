@@ -4,23 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { ButtonBar } from "../components/btn/ButtonBar";
 import { Button } from "../components/btn/Button";
-
-const getRecipe = (accessToken, recipeId) => {
-  return fetch(`http://localhost:8080/recipes/${recipeId}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-}
-
-const deleteRecipe = (accessToken, recipeId) => {
-  return fetch(`http://localhost:8080/recipes/${recipeId}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-}
+import { DeleteRecipe, GetRecipe } from "../api/Recipe";
 
 function DeleteRecipePage() {
   const navigate = useNavigate();
@@ -32,7 +16,7 @@ function DeleteRecipePage() {
 
   const handleDelete = async () => {
     const token = await getAccessTokenSilently();
-    const res = await deleteRecipe(token, recipeId);
+    const res = await DeleteRecipe(token, recipeId);
     const json = await res.json();
 
     if (!res.ok) {
@@ -44,7 +28,7 @@ function DeleteRecipePage() {
 
   const fetchRecipe = useCallback(async () => {
     const token = await getAccessTokenSilently();
-    const res = await getRecipe(token, recipeId);
+    const res = await GetRecipe(token, recipeId);
     const json = await res.json();
 
     if (!res.ok) {
