@@ -2,6 +2,7 @@ import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { GetRecipe } from "../api/Recipe";
+import { Page } from "../components/page/Page";
 import RecipeForm from "../components/recipe/RecipeForm";
 
 function EditRecipePage() {
@@ -36,19 +37,10 @@ function EditRecipePage() {
     getRecipe();
   }, [getAccessTokenSilently]);
 
-  if (isLoading) {
-    return <div>Loading...</div>
-  }
-
-  if (error) {
-    return <div>{error}</div>
-  }
-
   return (
-    <div className="page">
-      <h1>Edit a recipe</h1>
-      <RecipeForm editingId={recipeId} editingName={recipe.name} editingIngredients={recipe.ingredients} editingSteps={recipe.steps} />
-    </div>
+    <Page title="Edit recipe" loading={isLoading} error={error}>
+      <RecipeForm editingId={recipeId} editingName={recipe?.name} editingIngredients={recipe?.ingredients} editingSteps={recipe?.steps} />
+    </Page>
   )
 }
 
