@@ -6,6 +6,10 @@ import { Page } from "../components/page/Page";
 import { ButtonBar } from "../components/btn/ButtonBar";
 import { Button } from "../components/btn/Button";
 import { GetRecipes } from "../api/Recipe";
+import { Pagination } from "../components/page/Pagination";
+
+const PAGE_LIMIT = 9;
+const DEFAULT_OFFSET = 0;
 
 function RecipesPage() {
   const navigate = useNavigate();
@@ -14,10 +18,14 @@ function RecipesPage() {
   const [recipes, setRecipes] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(0);
 
-  const fetchRecipes = useCallback(async () => {
+  const fetchRecipes = useCallback(async (newOffset) => {    
+    setIsLoading(true);
+
     const token = await getAccessTokenSilently();
-    const res = await GetRecipes(token);
+    const res = await GetRecipes(token, PAGE_LIMIT, newOffset);
     const json = await res.json();
 
     if (!res.ok) {
@@ -28,21 +36,27 @@ function RecipesPage() {
       }
     } else {
       setRecipes(json.recipes);
+      setTotal(json.total);
+      setOffset(newOffset);
     }
 
     setIsLoading(false);
   }, [getAccessTokenSilently, navigate])
 
   useEffect(() => {
-    fetchRecipes();
+    fetchRecipes(DEFAULT_OFFSET);
   }, [fetchRecipes]);
 
   return (
     <Page title="My Recipes" loading={isLoading} error={error}>
+
       <ButtonBar>
         <Button onClick={() => navigate("/recipes/new", { state: { redirect: "/recipes" }})}>Add Recipe</Button>
       </ButtonBar>
+      
       <Recipes recipes={recipes} />
+
+      <Pagination pageLimit={PAGE_LIMIT} pageOffset={offset} total={total} changePageCallback={fetchRecipes} />
     </Page>
   );
 }
