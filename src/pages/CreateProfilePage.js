@@ -1,12 +1,12 @@
 import { withAuthenticationRequired } from "@auth0/auth0-react";
+import { Page } from "../components/page/Page";
 import ProfileForm from "../components/profile/ProfileForm";
 
 function CreateProfilePage() {
   return (
-    <div className="page">
-      <h1>Choose a username</h1>
+    <Page title="Choose a username">
       <ProfileForm />
-    </div>
+    </Page>
   )
 }
 
