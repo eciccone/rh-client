@@ -6,6 +6,10 @@ export const Page = ({ title = "", loading = false, error = null, children }) =>
     return <div className="page">Loading...</div>
   }
 
+  if (error) {
+    return <div className="page">{ error }</div>
+  }
+
   return (
     <div className="page">
 
