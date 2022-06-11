@@ -1,12 +1,12 @@
 import { withAuthenticationRequired } from "@auth0/auth0-react";
+import { Page } from "../components/page/Page";
 import RecipeForm from "../components/recipe/RecipeForm";
 
 function CreateRecipePage() {
   return (
-    <div className="page">
-      <h1>Create a recipe</h1>
+    <Page title="Create a recipe">
       <RecipeForm />
-    </div>
+    </Page>
   )
 }
 
