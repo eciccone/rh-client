@@ -1,54 +1,53 @@
 import "./Page.css";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import Recipes from "../components/recipe/Recipes";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { ButtonBar } from "../components/btn/ButtonBar";
 import { Button } from "../components/btn/Button";
 import { GetRecipes } from "../api/Recipe";
 
 function RecipesPage() {
-  const [recipes, setRecipes] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState();
   const navigate = useNavigate();
   const { getAccessTokenSilently } = useAuth0();
 
-  useEffect(() => {
-    const getRecipes = async () => {
-      const token = await getAccessTokenSilently();
-      await GetRecipes(token)
-        .then(async res => {
-          if (res.ok) return res;
-          const json = await res.json();
-          const err = new Error(json.msg);
-          throw err;
-        })
-        .then(res => res.json())
-        .then(json => setRecipes(json.recipes))
-        .catch(err => {
-          if (err.message === "profile not found") {
-            navigate("/profile/new", { state: { redirect: "/recipes" }});
-          } else {
-            setError(err.message);
-          }
-        })
-        .finally(() => setIsLoading(false));
-    };
+  const [recipes, setRecipes] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    getRecipes();
-  }, [getAccessTokenSilently, navigate]);
+  const fetchRecipes = useCallback(async () => {
+    const token = await getAccessTokenSilently();
+    const res = await GetRecipes(token);
+    const json = await res.json();
+
+    if (!res.ok) {
+      if (json.msg === "profile not found") {
+        navigate("/profile/new",  { state: { redirect: "/recipes" }});
+      } else {
+        setError(json.msg);
+      }
+    } else {
+      setRecipes(json.recipes);
+    }
+
+    setIsLoading(false);
+  }, [getAccessTokenSilently, navigate])
+
+  useEffect(() => {
+    fetchRecipes();
+  }, [fetchRecipes]);
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <div>Fetching recipes...</div>
+  }
+
+  if (error) {
+    return <div>{error}</div>
   }
 
   return (
     <div className="page">
       <h1>My Recipes</h1>
-
-      {error}
-
       <ButtonBar>
         <Button onClick={() => navigate("/recipes/new", { state: { redirect: "/recipes" }})}>Add Recipe</Button>
       </ButtonBar>
