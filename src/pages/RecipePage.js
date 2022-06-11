@@ -1,4 +1,3 @@
-import "./Page.css";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";

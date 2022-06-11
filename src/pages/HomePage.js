@@ -1,4 +1,3 @@
-import './Page.css'
 import './HomePage.css';
 import { Page } from '../components/page/Page';
 
