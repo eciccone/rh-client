@@ -35,7 +35,7 @@ function EditRecipePage() {
     };
 
     getRecipe();
-  }, [getAccessTokenSilently]);
+  }, [getAccessTokenSilently, recipeId]);
 
   return (
     <Page title="Edit recipe" loading={isLoading} error={error}>
