@@ -1,8 +1,8 @@
-import "./Page.css";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import Recipes from "../components/recipe/Recipes";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { Page } from "../components/page/Page";
 import { ButtonBar } from "../components/btn/ButtonBar";
 import { Button } from "../components/btn/Button";
 import { GetRecipes } from "../api/Recipe";
@@ -37,22 +37,13 @@ function RecipesPage() {
     fetchRecipes();
   }, [fetchRecipes]);
 
-  if (isLoading) {
-    return <div>Fetching recipes...</div>
-  }
-
-  if (error) {
-    return <div>{error}</div>
-  }
-
   return (
-    <div className="page">
-      <h1>My Recipes</h1>
+    <Page title="My Recipes" loading={isLoading} error={error}>
       <ButtonBar>
         <Button onClick={() => navigate("/recipes/new", { state: { redirect: "/recipes" }})}>Add Recipe</Button>
       </ButtonBar>
       <Recipes recipes={recipes} />
-    </div>
+    </Page>
   );
 }
 
