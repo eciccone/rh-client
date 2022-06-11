@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router";
 import { ButtonBar } from "../components/btn/ButtonBar";
 import { Button } from "../components/btn/Button";
 import { DeleteRecipe, GetRecipe } from "../api/Recipe";
+import { Page } from "../components/page/Page";
 
 function DeleteRecipePage() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ function DeleteRecipePage() {
   const { recipeId } = useParams();
 
   const [recipe, setRecipe] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const handleDelete = async () => {
@@ -24,6 +26,8 @@ function DeleteRecipePage() {
     } else {
       navigate("/recipes");
     }
+
+    setIsLoading(false);
   }
 
   const fetchRecipe = useCallback(async () => {
@@ -37,6 +41,7 @@ function DeleteRecipePage() {
       setRecipe(json.recipe);
     }
 
+    setIsLoading(false);
   }, [getAccessTokenSilently, recipeId])
 
   useEffect(() => {
@@ -44,21 +49,12 @@ function DeleteRecipePage() {
   }, [fetchRecipe]);
 
   return (
-    <div className="page">
-      
-      { error && <p>{error}</p> }
-
-      { recipe !== null && (
-        <>
-          <h1>Confirm delete {recipe.name}?</h1>
-          
-          <ButtonBar>
-            <Button onClick={handleDelete}>Delete</Button>
-            <Button onClick={() => navigate(`/recipes/${recipeId}`)}>Cancel</Button>
-          </ButtonBar>
-        </>
-      )}
-    </div>
+    <Page title={`Confirm delete ${recipe?.name}?`} loading={isLoading} error={error}>
+      <ButtonBar>
+        <Button onClick={handleDelete}>Delete</Button>
+        <Button onClick={() => navigate(`/recipes/${recipeId}`)}>Cancel</Button>
+      </ButtonBar>
+    </Page>
   );
 }
 
