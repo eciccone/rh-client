@@ -1,6 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Button } from '../btn/Button';
 import { ButtonBar } from '../btn/ButtonBar';
 import './RecipeForm.css';
@@ -48,7 +48,6 @@ export default function RecipeForm({
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const form = useRef(null);
-  const location = useLocation();
 
   const [id] = useState(editingId);
   const [name, setName] = useState(editingName);
@@ -204,7 +203,7 @@ export default function RecipeForm({
 
       <ButtonBar>
         <Button type="submit">Submit</Button>
-        <Button type="button" onClick={() => navigate(location.state.redirect)}>Cancel</Button>
+        <Button type="button" onClick={() => navigate(`/recipes/${id}`)}>Cancel</Button>
       </ButtonBar>
     </form>
   );
