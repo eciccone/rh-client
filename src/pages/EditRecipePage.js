@@ -1,7 +1,7 @@
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router";
-import { GetRecipe } from "../api/Recipe";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import { GetRecipe, PutRecipe, PutRecipeImage } from "../api/Recipe";
 import { Page } from "../components/page/Page";
 import RecipeForm from "../components/recipe/RecipeForm";
 
@@ -9,9 +9,29 @@ function EditRecipePage() {
 
   const { getAccessTokenSilently } = useAuth0();
   const { recipeId } = useParams();
+  const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [recipe, setRecipe] = useState();
+  const [submitError, setSubmitError] = useState(null);
+
+  const updateRecipe = useCallback(async (id, data, imageFile) => {
+    const token = await getAccessTokenSilently();
+    const res = await PutRecipe(token, id, data);
+    const json = await res.json();
+
+    if (!res.ok) {
+      setSubmitError(json.msg);
+    } else {
+      if (imageFile !== null) {
+        const imageFormData = new FormData();
+        imageFormData.append("image", imageFile);
+        await PutRecipeImage(token, json.recipe.id, imageFormData);
+      }
+      navigate(`/recipes/${json.recipe.id}`);
+    }
+  }, [getAccessTokenSilently, navigate])
 
   useEffect(() => {
     const getRecipe = async () => {
@@ -39,7 +59,16 @@ function EditRecipePage() {
 
   return (
     <Page title="Edit recipe" loading={isLoading} error={error}>
-      <RecipeForm editingId={recipeId} editingName={recipe?.name} editingIngredients={recipe?.ingredients} editingSteps={recipe?.steps} />
+      
+      { submitError }
+
+      <RecipeForm 
+        editingId={recipeId} 
+        editingName={recipe?.name} 
+        editingIngredients={recipe?.ingredients} 
+        editingSteps={recipe?.steps}
+        submitCallback={updateRecipe}
+      />
     </Page>
   )
 }
