@@ -139,7 +139,7 @@ export default function RecipeForm({
 
       <ButtonBar>
         <Button type="submit">Submit</Button>
-        <Button type="button" onClick={() => navigate(`/recipes/${id}`)}>Cancel</Button>
+        <Button type="button" onClick={() => id === 0 ? navigate("/recipes") : navigate(`/recipes/${id}`)}>Cancel</Button>
       </ButtonBar>
     </form>
   );
